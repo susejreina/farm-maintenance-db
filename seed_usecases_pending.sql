@@ -109,7 +109,7 @@ WITH comp AS (
   FROM equipment_components ec
   JOIN equipment e ON e.id = ec.equipment_id
   JOIN component_types ct ON ct.id = ec.component_type_id
-  WHERE e.name='Combine X' AND ct.name = 'cabin air filter'
+  WHERE e.name='Combine X' AND ct.name = 'cabin_air_filter'
 ), task AS (
   SELECT id AS task_id FROM maintenance_tasks WHERE code='CABIN_AIR_FILTER_REPLACE'
 )
@@ -149,7 +149,7 @@ FROM equipment e, component_types ct
 WHERE ec.equipment_id = e.id
   AND e.name='Combine X'
   AND ct.id = ec.component_type_id
-  AND ct.name = 'cabin air filter';
+  AND ct.name = 'cabin_air_filter';
 
 -- 3C) (Optional) Create Tractor B (same model) to illustrate "whichever comes first" by TIME
 --     No equipment override. Low usage (<250h) but age >12 months ⇒ due by TIME.

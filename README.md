@@ -1,5 +1,5 @@
 
-# FarmerTitan — Maintenance Scheduling Database
+# Farmer Maintenance — Maintenance Scheduling Database
 
 **Author:** © 2025 Susej Reina — All rights reserved.  
 This schema and documentation were designed as part of a technical challenge.  

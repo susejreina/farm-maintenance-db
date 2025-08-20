@@ -113,7 +113,7 @@ CREATE INDEX IF NOT EXISTS idx_manufacturers_country ON manufacturers(country);
 -- component_types: families of components/parts (oil filter, battery, ...)
 -- ------------------------------------------------------------
 CREATE TABLE component_types (
-  id           BIGINT PRIMARY KEY,
+  id           BIGSERIAL PRIMARY KEY,
   name         TEXT NOT NULL UNIQUE,
   description  TEXT,
   is_active    BOOLEAN NOT NULL DEFAULT TRUE,
@@ -138,8 +138,7 @@ CREATE TABLE part_catalog (
   created_at         TIMESTAMPTZ(0) NOT NULL DEFAULT date_trunc('second', now()),
   created_by         UUID,
   updated_at         TIMESTAMPTZ(0),
-  updated_by         UUID,
-  UNIQUE (component_type_id, sku)
+  updated_by         UUID
 );
 CREATE INDEX IF NOT EXISTS idx_part_component    ON part_catalog(component_type_id);
 CREATE INDEX IF NOT EXISTS idx_part_manufacturer ON part_catalog(manufacturer_id);
@@ -276,7 +275,8 @@ CREATE TABLE equipment_components (
   created_at         TIMESTAMPTZ(0) NOT NULL DEFAULT date_trunc('second', now()),
   created_by         UUID,
   updated_at         TIMESTAMPTZ(0),
-  updated_by         UUID
+  updated_by         UUID,
+  CHECK (removed_at IS NULL OR installed_at IS NULL OR removed_at >= installed_at)
 );
 CREATE INDEX IF NOT EXISTS idx_equipment_components_equipment ON equipment_components(equipment_id);
 CREATE INDEX IF NOT EXISTS idx_equipment_components_type      ON equipment_components(component_type_id);
@@ -383,7 +383,7 @@ CREATE TABLE maintenance_logs (
   equipment_id             BIGINT NOT NULL REFERENCES equipment(id),
   equipment_component_id   BIGINT REFERENCES equipment_components(id),
   task_id                  BIGINT NOT NULL REFERENCES maintenance_tasks(id),
-  plan_id                  BIGINT REFERENCES maintenance_plans(id),
+  plan_id                  BIGINT REFERENCES maintenance_plans(id) ON DELETE SET NULL,
   performed_at             TIMESTAMPTZ(0) NOT NULL DEFAULT date_trunc('second', now()),
   usage_counter_id         BIGINT REFERENCES counter_types(id),
   usage_value_at_service   NUMERIC(18,3),

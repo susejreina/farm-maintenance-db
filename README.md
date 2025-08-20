@@ -1,12 +1,6 @@
 
 # Farmer Maintenance — Maintenance Scheduling Database
 
-**Author:** © 2025 Susej Reina — All rights reserved.  
-This schema and documentation were designed as part of a technical challenge.  
-Redistribution or use without explicit permission is prohibited.
-
----
-
 ## 1. Introduction
 
 Managing preventive maintenance for farm equipment is complex. Different machines (tractors, harvesters, sprayers) require service based on hours, mileage, or elapsed time. Even specific **parts** (oil filters, belts, hydraulic pumps) carry their own intervals, which may change if replaced with aftermarket alternatives.  
@@ -148,7 +142,7 @@ SELECT * FROM v_maintenance_due_simple ORDER BY equipment_name, task_code, rule_
 - **Tractor B** → `ENGINE_OIL_CHANGE` due by **TIME** (≥12 months since in-service, usage below 250h).
 
 
-## 9. Partitioning Strategy (Concise)
+## 9. Partitioning Strategy
 
 **When:** Not needed initially. Enable once history grows enough to hurt latency or storage ops.
 
@@ -159,19 +153,19 @@ SELECT * FROM v_maintenance_due_simple ORDER BY equipment_name, task_code, rule_
 **Why:** Both are append-heavy and time-filtered; partition pruning keeps scans small. Due-date logic remains unchanged.
 
 **Signals to enable:**
-- Table > 10–20 GB **o** > 10–20M filas, **o**
-- EXPLAIN ANALYZE muestra escaneos grandes en historia.
+- Table > 10–20 GB **or** > 10–20M rows, **or**
+- EXPLAIN ANALYZE shows large scans on history.
 
 **Keys & indexes:**
-- PKs deben incluir la clave de partición.
-- Índices particionados en `(meter_id, reading_at)` y `(equipment_id, performed_at)`.
+- PKs must include the partition key.
+- Partitioned indexes on `(meter_id, reading_at)` and `(equipment_id, performed_at)`.
 
 **Ops:**
-- Crear particiones futuras (job mensual/anual).
-- Política de retención: p.ej. 5 años “hot”, archivar el resto.
-- Mantener tablas resumen para “latest reading / last service” y evitar escanear historia.
+- Create future partitions (monthly/annual job).
+- Retention policy: e.g., 5 years “hot”, archive the rest.
+- Maintain summary tables for “latest reading / last service” to avoid scanning history.
 
-> Ver `partitioning_examples.sql` para DDL de referencia.
+> See `partitioning_examples.sql` for reference DDL.
 
 ## 10. Future Enhancements
 
